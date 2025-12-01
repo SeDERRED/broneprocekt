@@ -1,6 +1,6 @@
 # Hotel (room reservations)
 ru
-О програме:
+ О програме:
 Это программа с системой бронирования с возможностю отмена брони, с акунтом админа, с регистрацией
 
 что в ней есть:
@@ -9,7 +9,7 @@ ru
 3. Управление адменистратора
 
 en 
-About the program:
+ About the program:
 This program features a booking system with cancellation options, an admin account, and registration.
 
 What it includes:
@@ -18,7 +18,7 @@ What it includes:
 3. Administrator management
 
 et
-Programmi kohta:
+ Programmi kohta:
 See programm sisaldab broneerimissüsteemi tühistamisvõimalustega, administraatori kontot ja registreerimist.
 
 Mida see sisaldab:
