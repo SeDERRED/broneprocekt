@@ -56,11 +56,21 @@
         }
 
         .room {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 10px;
-            background: #f9f9f9;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+          position: relative;      /* делаем контейнер относительным */
+          padding: 20px;           /* чтобы содержимое не прилипало к краю */
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          margin-bottom: 15px;
+          background: #fff;
+        }
+
+        .details-link {
+          position: absolute;      /* позиционируем относительно .room */
+          top: 10px;               /* отступ сверху */
+          right: 10px;             /* отступ справа */
+          color: #007bff;
+          font-weight: bold;
+          text-decoration: none;
         }
 
         .room p {

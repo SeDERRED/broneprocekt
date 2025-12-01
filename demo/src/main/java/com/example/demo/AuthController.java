@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,8 +39,8 @@ public class AuthController {
 
     // Логин
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestParam String username,
-                                                     @RequestParam String password) {
+    public ResponseEntity<Map<String, Serializable>> login(@RequestParam String username,
+                                                           @RequestParam String password) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty() || !user.get().getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -48,7 +49,8 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of(
                 "message", "Успешный вход!",
-                "role", user.get().getRole()
+                "role", user.get().getRole(),
+                "id", user.get().getId()
         ));
     }
 }
