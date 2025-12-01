@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotelli broneerimine</title>
+    <link rel="stylesheet" href="/scratch.css">
+    </head>
+    <body>
+    <h1>Hotelli broneerimine</h1>
+
+    <div class="container">
+        <!-- Секция авторизации -->
+        <div id="authSection" class="auth">
+            <h2>Регистрация / Вход</h2>
+            <input type="text" id="username" placeholder="Имя пользователя">
+            <input type="password" id="password" placeholder="Пароль">
+            <button onclick="register()">Зарегистрироваться</button>
+            <button onclick="login()">Войти</button>
+        </div>
+
+        <!-- Секция бронирования -->
+        <div id="bookingSection" style="display: none;">
+            <div class="logout">
+                <p>Добро пожаловать, <span id="userDisplay"></span>!</p>
+                <button onclick="logout()">Выйти</button>
+            </div>
+
+            <h2>Список комнат</h2>
+            <div id="rooms">Загружаю комнаты...</div>
+        </div>
+    </div>
+
+<!-- Подключаем JS из папки static/js -->
+<script src="/scratch.js"></script>
+</body>
+</html>
