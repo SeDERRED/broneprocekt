@@ -62,24 +62,31 @@ public class Roomcontroller {
             @RequestParam Long userId,
             @RequestParam(required = false) String role
     ) {
-        Booking booking = bookingRepository.findByRoomId(id)
-                .orElseThrow(() -> new RuntimeException("Бронирование не найдено"));
-
         boolean isAdmin = "admin".equalsIgnoreCase(role);
 
-        if (!isAdmin && !booking.getUserId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("У вас нет прав отменять чужое бронирование");
+        // Ищем активное бронирование пользователя для этой комнаты
+        Booking booking = bookingRepository.findAll().stream()
+                .filter(b -> b.getRoomId().equals(id))
+                .filter(b -> !b.isCanceled())  // только активные брони
+                .filter(b -> isAdmin || b.getUserId().equals(userId)) // если не админ — только свои
+                .findFirst()
+                .orElse(null);
+
+        if (booking == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Активное бронирование для этой комнаты не найдено");
         }
 
+        // Отменяем бронь
         booking.setCanceled(true);
         bookingRepository.save(booking);
 
-        Room room = roomRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new RuntimeException("Комната не найдена"));
-
-        room.setVacant(true);
-        roomRepository.save(room);
+        // Освобождаем комнату
+        Room room = roomRepository.findById(Math.toIntExact(id)).orElse(null);
+        if (room != null) {
+            room.setVacant(true);
+            roomRepository.save(room);
+        }
 
         return ResponseEntity.ok("Бронирование отменено");
     }
