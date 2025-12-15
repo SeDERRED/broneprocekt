@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Детали комнаты [[${room.name}]]</title>
     <style>
+        /* === твой существующий CSS === */
         body {
             font-family: 'Arial', sans-serif;
             max-width: 900px;
@@ -30,6 +31,25 @@
 
         .room-info p {
             margin: 5px 0;
+        }
+        .room-info {
+        position: relative; /* чтобы позиционировать дочерние элементы относительно */
+        }
+
+        .rating-on-hover {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1.1em;
+            color: #f1c40f;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* чтобы блок не мешал мыши */
+        }
+
+        .room-info:hover .rating-on-hover {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .status {
@@ -108,6 +128,154 @@
             font-size: 1.1em;
         }
 
+        /* === добавленные улучшения === */
+
+        /* Плавный hover для карточки комнаты */
+        .room-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        /* Звезды рейтинга */
+        .stars {
+            font-size: 1.2em;
+            color: #f1c40f;
+        }
+
+        /* Отзывы */
+        .reviews {
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .review-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .review-comment {
+            margin: 5px 0;
+        }
+
+        /* Форма отзывов */
+        .review-form {
+        max-width: 500px;
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px 25px;
+        border-radius: 10px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        font-family: 'Arial', sans-serif;
+        }
+
+        .review-form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .review-form select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1.5px solid #ccc;
+            font-size: 1em;
+            background-color: #fafafa;
+            margin-top: 6px;
+            transition: border-color 0.3s ease;
+        }
+
+        .review-form select:hover,
+        .review-form select:focus {
+            border-color: #f1c40f;
+            outline: none;
+            background-color: #fffbea;
+        }
+
+        .review-form textarea {
+            width: 90%;
+            margin-top: 6px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1.5px solid #ccc;
+            resize: vertical;
+            font-size: 1em;
+            font-family: 'Arial', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .review-form textarea:focus {
+            border-color: #2980b9;
+            outline: none;
+            background-color: #f0f8ff;
+        }
+
+        .review-form button {
+            margin-top: 18px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .review-form button:hover {
+            background-color: #3498db;
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5);
+        }
+        .review-item b {
+        display: block;
+        margin-bottom: 3px;
+        }
+
+        .stars-wrapper {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .review-comment {
+            margin-top: 5px;
+        }
+        .stars-wrapper {
+        position: relative;
+        display: inline-block;
+        font-size: 1.2em;
+        color: #ccc; /* пустые звезды */
+        margin-left: 10px;
+        }
+
+        .stars-empty {
+            color: #ccc;
+        }
+
+        .stars-filled {
+            position: absolute;
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #f1c40f; /* цвет залитых звезд */
+        }
+
     </style>
 </head>
 <body>
@@ -115,15 +283,18 @@
 <h1 th:text="'Комната: ' + ${room.name}">Название</h1>
 
 <div class="room-info">
-    <div>
-        <p><b>Цена:</b> <span th:text="${room.price}">100</span> €</p>
-        <p><b>Площадь:</b> <span th:text="${roomDescription.sqM}">10</span> м²</p>
-        <p><b>Wi-Fi:</b> <span th:text="${roomDescription.wifi}">Free Wi-Fi</span></p>
-        <p><b>Кондиционер:</b> <span th:text="${roomDescription.airConditioning} ? 'Есть' : 'Нет'">Есть</span></p>
-    </div>
-    <div>
-        <p class="status" th:classappend="${room.vacant} ? ' free' : ' booked'"
-           th:text="${room.vacant} ? 'Свободна' : 'Забронирована'">Свободна</p>
+<div>
+    <p><b>Цена:</b> <span th:text="${room.price}">100</span> €</p>
+    <p><b>Площадь:</b> <span th:text="${roomDescription.sqM}">10</span> м²</p>
+    <p><b>Wi-Fi:</b> <span th:text="${roomDescription.wifi}">Free Wi-Fi</span></p>
+    <p><b>Кондиционер:</b> <span th:text="${roomDescription.airConditioning} ? 'Есть' : 'Нет'">Есть</span></p>
+</div>
+<div>
+    <p class="status" th:classappend="${room.vacant} ? ' free' : ' booked'"
+       th:text="${room.vacant} ? 'Свободна' : 'Забронирована'">Свободна</p>
+</div>
+    <div class="rating-on-hover">
+        <span th:text="${stars}">⭐⭐⭐☆☆</span>
     </div>
 </div>
 
@@ -135,11 +306,52 @@
     </ul>
 </div>
 
+<div class="reviews">
+    <h3>Отзывы</h3>
+
+    <div th:if="${#lists.isEmpty(reviews)}">
+        <p>Отзывов пока нет.</p>
+    </div>
+
+    <div th:each="review : ${reviews}" class="review-item">
+        <b th:text="${review.user.username}">Имя пользователя</b>
+        <div class="stars-wrapper" style="margin: 5px 0;">
+            <span class="stars-filled" th:style="'width:' + (${review.rating} * 20) + '%'">★★★★★</span>
+            <span class="stars-empty">★★★★★</span>
+        </div>
+        <small th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2025</small>
+        <p class="review-comment" th:text="${review.comment}">Комментарий</p>
+    </div>
+
+    <!-- Форма для добавления отзыва -->
+    <div th:if="${canReview}">
+        <h4>Оставить отзыв</h4>
+        <form th:action="@{'/rooms/' + ${room.id} + '/review'}" method="post" class="review-form">
+            <input type="hidden" name="userId" th:value="${userId}" />
+
+            <label for="rating">Рейтинг:</label>
+            <select id="rating" name="rating">
+                <option value="1">1 ⭐</option>
+                <option value="2">2 ⭐⭐</option>
+                <option value="3">3 ⭐⭐⭐</option>
+                <option value="4">4 ⭐⭐⭐⭐</option>
+                <option value="5">5 ⭐⭐⭐⭐⭐</option>
+            </select>
+
+            <label for="comment">Комментарий:</label>
+            <textarea id="comment" name="comment" rows="4" placeholder="Напишите ваш отзыв..." required></textarea>
+
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+</div>
+
+
 <div class="photos">
     <img th:each="photo : ${photos}" th:src="@{${photo}}" th:alt="'Фото ' + ${room.name}" />
 </div>
 
-<a href="/" class="back-link">← Вернуться к списку комнат</a>
-
+<a href="#" class="back-link" onclick="goBack()">← Вернуться к списку комнат</a>
+<script src="/scratch.js"></script>
 </body>
 </html>

@@ -1,6 +1,18 @@
 console.log("SCRATCH JS STARTED");
 let currentUser = null;
 
+// Восстанавливаем пользователя при загрузке страницы
+window.addEventListener('DOMContentLoaded', () => {
+    const storedUser = sessionStorage.getItem('currentUser');
+    if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('bookingSection').style.display = 'block';
+        document.getElementById('userDisplay').innerText = currentUser.username;
+        loadRooms();
+    }
+});
+
 // Регистрация
 async function register() {
     const username = document.getElementById('username').value.trim();
@@ -35,21 +47,25 @@ async function login() {
         return alert(data.message);
     }
 
-    currentUser = { id: data.id, username, role: data.role }; // <-- теперь точно получаем роль
+    currentUser = { id: data.id, username, role: data.role };
+    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('bookingSection').style.display = 'block';
     document.getElementById('userDisplay').innerText = username;
+
     loadRooms();
 }
 
 // Выход
 function logout() {
     currentUser = null;
+    sessionStorage.removeItem('currentUser');
     document.getElementById('authSection').style.display = 'block';
     document.getElementById('bookingSection').style.display = 'none';
 }
 
-// Загрузка списка комнат
+// Загрузка комнат и бронирование / отмена
 async function loadRooms() {
     const res = await fetch('/hotel2/rooms');
     const rooms = await res.json();
@@ -59,15 +75,14 @@ async function loadRooms() {
     rooms.forEach(r => {
         const roomDiv = document.createElement('div');
         roomDiv.className = 'room';
-        roomDiv.style.display = 'flex';                 // включаем flex для выравнивания
-        roomDiv.style.justifyContent = 'space-between'; // разделяем контент и ссылку
+        roomDiv.style.display = 'flex';
+        roomDiv.style.justifyContent = 'space-between';
         roomDiv.style.alignItems = 'center';
         roomDiv.style.padding = '10px';
         roomDiv.style.border = '1px solid #ccc';
         roomDiv.style.borderRadius = '8px';
         roomDiv.style.marginBottom = '10px';
 
-        // Левая часть с инфо и кнопкой
         const leftDiv = document.createElement('div');
         leftDiv.innerHTML = `
             <p><b>${r.name}</b></p>
@@ -89,27 +104,18 @@ async function loadRooms() {
         }
         leftDiv.appendChild(button);
 
-        // Правая часть — ссылка "See details >>>"
         const rightDiv = document.createElement('div');
         const detailsLink = document.createElement('a');
         detailsLink.href = `/rooms/${r.id}`;
         detailsLink.textContent = 'See details >>>';
-        detailsLink.className = 'details-link';
-        detailsLink.style.textDecoration = 'none';
-        detailsLink.style.color = '#007bff';
-        detailsLink.style.fontWeight = 'bold';
-
         rightDiv.appendChild(detailsLink);
 
-        // Собираем в одну карточку
         roomDiv.appendChild(leftDiv);
         roomDiv.appendChild(rightDiv);
-
         div.appendChild(roomDiv);
     });
 }
 
-// Бронирование комнаты
 async function bookRoom(id) {
     const startDate = document.getElementById(`start-${id}`).value;
     const endDate = document.getElementById(`end-${id}`).value;
@@ -123,10 +129,10 @@ async function bookRoom(id) {
         return;
     }
 
-   const res = await fetch(
-       `/hotel2/rooms/${id}/book?startDate=${startDate}&endDate=${endDate}&userId=${currentUser.id}`,
-       { method: 'POST' }
-   );
+    const res = await fetch(
+        `/hotel2/rooms/${id}/book?startDate=${startDate}&endDate=${endDate}&userId=${currentUser.id}`,
+        { method: 'POST' }
+    );
     if (res.ok) {
         alert('Комната успешно забронирована!');
         loadRooms();
@@ -149,4 +155,11 @@ async function cancelBooking(id) {
         alert('Ошибка отмены бронирования: ' + err);
     }
 }
-
+function goBack() {
+    const storedUser = sessionStorage.getItem('currentUser');
+    if (storedUser) {
+        window.location.href = '/'; // сюда обращается твой контроллер
+    } else {
+        alert('Сначала войдите в систему');
+    }
+}

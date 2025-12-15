@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,12 +41,16 @@ public class AuthController {
     // Логин
     @PostMapping("/login")
     public ResponseEntity<Map<String, Serializable>> login(@RequestParam String username,
-                                                           @RequestParam String password) {
+                                                           @RequestParam String password,
+                                                           HttpSession session) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty() || !user.get().getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Неверный логин или пароль!"));
         }
+
+        // <- сюда
+        session.setAttribute("userId", user.get().getId());
 
         return ResponseEntity.ok(Map.of(
                 "message", "Успешный вход!",
